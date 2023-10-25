@@ -1,5 +1,6 @@
 import express from 'express'
 import router from './routes/api.js'
+import connection from './connection.js'
 
 const app = express()
 
@@ -14,6 +15,8 @@ app.use((req, res) => {
         message: "NOT FOUND"
     })
 })
+
+connection()
 
 app.listen(3000, () => {
     console.log('Server listening on port 3000')
