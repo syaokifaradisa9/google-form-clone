@@ -1,0 +1,23 @@
+{
+  "name": "google-form-clone",
+  "version": "1.0.0",
+  "description": "Get started by customizing your environment (defined in the .idx/dev.nix file) with the tools and IDE extensions you'll need for your project!",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syaokifaradisa9/google-form-clone.git"
+  },
+  "author": "Muhammad Syaoki Faradisa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/syaokifaradisa9/google-form-clone/issues"
+  },
+  "homepage": "https://github.com/syaokifaradisa9/google-form-clone#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
