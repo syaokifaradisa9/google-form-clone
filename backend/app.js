@@ -12,6 +12,11 @@ app.use(express.urlencoded({
 
 // Embedding Routes
 app.use('/api', apiRouter)
+app.use((req, res) => {
+    res.status(404).json({
+        message: '404_NOT_FOUND'
+    });
+});
 
 // Connect to MongoDB
 connection()
