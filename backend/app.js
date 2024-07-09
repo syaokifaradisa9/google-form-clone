@@ -1,7 +1,12 @@
+import dotenv from 'dotenv'
 import express from 'express'
 import apiRouter from './routes/api.js'
 import connection from './connection.js'
 
+// Load environment variables
+const env = dotenv.config().parsed
+
+// Create express object
 const app = express()
 
 // Embedding Middleware
@@ -22,6 +27,6 @@ app.use((req, res) => {
 connection()
 
 // Run Express
-app.listen(3000, () => {
-    console.log("Server started on port 3000");
+app.listen(env.APP_PORT, () => {
+    console.log(`Server started on port ${env.APP_PORT}`);
 })
