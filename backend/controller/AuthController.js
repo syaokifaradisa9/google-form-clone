@@ -2,6 +2,26 @@ import '../models/User.js'
 import User from '../models/User.js'
 import emailExists from '../libraries/email_exists.js'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+
+const env = dotenv.config().parsed
+
+const generateAccessToken = async (payload) => {
+    return jwt.sign(
+        payload,
+        env.ACCESS_TOKEN_SECRET,
+        { expiresIn: env.ACCESS_TOKEN_EXPIRATION_TIME }
+    )
+}
+
+const generateRefreshToken = async (payload) => {
+    return jwt.sign(
+        payload,
+        env.REFRESH_TOKEN_SECRET,
+        { expiresIn: env.REFRESH_TOKEN_EXPIRATION_TIME }
+    )
+}
 
 class AuthController{
     async register(req, res){
@@ -75,13 +95,53 @@ class AuthController{
                 throw { code: 400, message: 'PASSWORD_IS_INCORRECT' }
             }
 
+            let payload = { id: user._id }
+            const accessToken = await generateAccessToken(payload)
+            const refreshToken = await generateRefreshToken(payload)
+
             return res.status(200)
                 .json({
                     status: true,
                     message: 'USER_LOGGED_IN',
                     fullname: user.fullname,
+                    accessToken,
+                    refreshToken
                 })
         }catch(error){
+            return res.status(error.code || 500)
+                .json({
+                    status: false,
+                    message: error.message
+                })
+        }
+    }
+
+    async refreshToken(req, res){
+        try{
+            if(!req.body.refreshToken){
+                throw { code: 400, message: 'REFRESH_TOKEN_IS_REQUIRED' }
+            }
+
+            const verify = await jwt.verify(req.body.refreshToken, env.REFRESH_TOKEN_SECRET)
+            let payload = { id: verify.id }
+
+            const accessToken = await generateAccessToken(payload)
+            const refreshToken = await generateRefreshToken(payload)
+
+            return res.status(200)
+                .json({
+                    status: true,
+                    message: 'REFRESH_TOKEN_GENERATED',
+                    accessToken,
+                    refreshToken
+                })
+        }catch(error){
+            if(error.message == "jwt expired"){
+                error.message = 'REFRESH_TOKEN_IS_EXPIRED'
+            }else if(["invalid signature", "jwt malformed", "jwt must be provided", "invalid token"].includes(error.message)){
+                error.message = 'INVALID_REFRESH_TOKEN'
+            }
+
             return res.status(error.code || 500)
                 .json({
                     status: false,
