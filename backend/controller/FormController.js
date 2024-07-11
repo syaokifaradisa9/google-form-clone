@@ -2,6 +2,27 @@ import mongoose from 'mongoose'
 import Form from '../models/Form.js'
 
 class FormController{
+    async index(req, res){
+        try{
+            const forms = await Form.paginate({ userId: req.jwt.id }, {
+                page: parseInt(req.query.page) || 1,
+                limit: parseInt(req.query.limit) || 10
+            })
+
+            return res.status(200).json({
+                status: true,
+                message: 'FORMS_FOUND',
+                total: forms.length,
+                data: forms
+            })
+        }catch(error){
+            return res.status(error.code || 500).json({
+                status: false,
+                message: error.message
+            })
+        }
+    }
+
     async store(req, res){
         try{
             const form = await Form.create({
