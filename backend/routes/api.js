@@ -20,5 +20,6 @@ router.delete('/forms/:id', jwtAuth, FormController.destroy)
 
 // Question
 router.post('/forms/:id/questions', jwtAuth, QuestionController.store)
+router.put('/forms/:id/questions/:questionId', jwtAuth, QuestionController.update)
 
 export default router
