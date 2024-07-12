@@ -112,6 +112,51 @@ class QuestionController {
             });
         }
     }
+
+    async destroy(req, res) {
+        try {
+            if (!req.params.id) {
+                throw { code: 400, message: 'FORM_ID_IS_REQUIRED' };
+            }
+
+            if (!req.params.questionId) {
+                throw { code: 400, message: 'QUESTION_ID_IS_REQUIRED' };
+            }
+
+            if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+                throw { code: 400, message: 'INVALID_FORM_ID' };
+            }
+
+            if (!mongoose.Types.ObjectId.isValid(req.params.questionId)) {
+                throw { code: 400, message: 'INVALID_QUESTION_ID' };
+            }
+
+            const form = await Form.findOneAndUpdate(
+                { _id: req.params.id, userId: req.jwt.id },
+                { $pull: { questions: { id: mongoose.Types.ObjectId.createFromHexString(req.params.questionId) } } },
+                { new: true }
+            );
+
+            if (!form) {
+                throw { code: 404, message: 'QUESTION_DELETE_FAILED' };
+            }
+
+            return res.status(200).json({
+                status: true,
+                message: 'QUESTION_DELETED',
+                data: form
+            });
+        } catch (err) {
+            if (!err.code) {
+                err.code = 500;
+            }
+
+            return res.status(err.code).json({
+                status: false,
+                message: err.message
+            });
+        }
+    }
 }
 
 export default new QuestionController()
