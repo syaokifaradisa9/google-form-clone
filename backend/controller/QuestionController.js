@@ -4,6 +4,30 @@ import Form from "../models/Form.js"
 const allowedTypes = ['Text', 'Radio', 'Checkbox', 'Dropdown', 'Email']
 
 class QuestionController {
+    async index(req, res) {
+        try {
+            if(!req.params.id) {
+                throw { code: 400, message: 'FORM_ID_IS_REQUIRED' } 
+            }
+
+            const form = await Form.findOne({ _id: req.params.id, userId: req.jwt.id })
+            if(!form) {
+                throw { code: 404, message: 'FORM_NOT_FOUND' }
+            }
+
+            return res.status(200).json({
+                status: true,
+                message: 'FORM_FOUND',
+                data: form.questions
+            })
+        } catch (error) {
+            return res.status(error.code || 500).json({
+                status: false,
+                message: error.message
+            })
+        }
+    }
+
     async store(req, res) {
         try {
             if(!req.params.id) {
